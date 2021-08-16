@@ -28,7 +28,6 @@ def sendDailyQuote():
 			first_name = user["first_name"]
 			try:
 				print("sending quote to "+first_name) 
-				# if first_name == "Nidhish" or first_name == "QASSECRET":
 				bot.send_message(chat_id,"Hi, "+first_name+"\nHere's your daily quote\n"+str(quote)+"\n"+"\t"+" - "+str(author))
 			except telebot.apihelper.ApiTelegramException:
 				print(first_name," blocked the bot")
@@ -57,9 +56,10 @@ def message_check_in(event):
 
 def start_msg(chat_id, sender, username, date):
 	obj = dynamoDBAccess(Config.table_name)
+	user_present = obj.compare_chat_id(chat_id)
 	obj.putRow(chat_id,date,sender,username)
 
-	if obj.filter_table(chat_id):
+	if not user_present:
 		msg_to_be_sent = Config.commands["welcome"].format(sender)
 	else:
 		msg_to_be_sent = Config.commands["welcome_back"].format(sender)

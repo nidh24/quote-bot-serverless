@@ -36,7 +36,10 @@ class dynamoDBAccess():
         response = self.table.scan("chat_id,first_name")
         return response['Items']
 
-    def filter_table(self,chat_id):
-        # projection expression
-        response = self.table.query("chat_id,first_name")
-        return response['Items']
+    def compare_chat_id(self,chat_id):
+        response = self.table.query(
+            KeyConditionExpression=Key('chat_id').eq(chat_id)
+        )
+        if len(response['Items']) == 0:
+            return False
+        return True
