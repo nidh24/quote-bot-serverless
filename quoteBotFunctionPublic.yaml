@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Serverless Specification template describing your function.
+Resources:
+  quoteBotFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: main.handler
+      Runtime: python3.7
+      CodeUri: .
+      Description: ''
+      MemorySize: 128
+      Timeout: 500
+      Role: >-
+        arn:aws:iam::<account-number>:role/service-role/<lambda-role>
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /quoteBotFunction
+            Method: ANY
+        Schedule1:
+          Type: Schedule
+          Properties:
+            Schedule: cron(30 3 ? * 1-7 *)
+      Environment:
+        Variables:
+          TOKEN: '<TOKEN>'
+      Layers:
+        - 'arn:aws:lambda:us-east-1:<account-number>:layer:<layer-1-name>:<version>'
+        - 'arn:aws:lambda:us-east-1:<account-number>:layer:<layer-2-name>:<version>'
