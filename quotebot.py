@@ -57,10 +57,10 @@ def message_check_in(event):
 def start_msg(chat_id, sender, username, date):
 	obj = dynamoDBAccess(Config.table_name)
 	user_present = obj.compare_chat_id(chat_id)
-	obj.putRow(chat_id,date,sender,username)
 
 	if not user_present:
 		msg_to_be_sent = Config.commands["welcome"].format(sender)
+		obj.putRow(chat_id,date,sender,username)
 	else:
 		msg_to_be_sent = Config.commands["welcome_back"].format(sender)
 	bot.send_message(chat_id, msg_to_be_sent)

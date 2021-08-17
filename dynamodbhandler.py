@@ -33,8 +33,17 @@ class dynamoDBAccess():
     
 
     def scan_table(self):
-        response = self.table.scan("chat_id,first_name")
-        return response['Items']
+        listofitems = list()
+        response = self.table.scan(ProjectionExpression="chat_id,first_name")
+
+        listofitems.extend(response['Items'])
+
+        while 'LastEvaluatedKey' in response:
+            response = self.table.scan(ProjectionExpression="chat_id,first_name",
+                    ExclusiveStartKey=response['LastEvaluatedKey'])
+            listofitems.extend(response['Items'])
+
+        return listofitems 
 
     def compare_chat_id(self,chat_id):
         response = self.table.query(
