@@ -3,6 +3,7 @@ from config import Config
 import os
 import boto3
 import sys
+from boto3.dynamodb.conditions import Key
 
 
 if sys.version_info[0] < 3: 
@@ -13,7 +14,7 @@ else:
 
 class dynamoDBAccess():
     
-    def __init__(self):
+    def __init__(self,table_name):
         # aws_id = os.environ['AWS_ID']
         # aws_secret = os.environ['AWS_SECRET']
         # self.client = client('s3' aws_access_key_id=aws_id,

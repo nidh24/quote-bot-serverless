@@ -44,19 +44,22 @@ def daily_quote(event):
 		sendDailyQuote()
 
 
-def message_check_in(event):
-	message = json.loads(event['body'])['message']
+def message_check_in(message):
 	chat_id = message['chat']['id']
 	sender = message['from']['first_name']
 	text = message['text']
 	date = message['date']
-	username = message['chat']["username"]
+	if "username" in message['chat']:
+		username = message['chat']["username"]
+	else:
+		username = ""
 	return chat_id, sender, text, username, date
 
 
 def start_msg(chat_id, sender, username, date):
 	obj = dynamoDBAccess(Config.table_name)
 	user_present = obj.compare_chat_id(chat_id)
+	print(user_present)
 
 	if not user_present:
 		msg_to_be_sent = Config.commands["welcome"].format(sender)
@@ -91,19 +94,20 @@ def send_msg(chat_id):
 
 
 def handle_msg(event):
-	chat_id, sender, text, username, date = message_check_in(event)
-	try:
-		msg = text.lower().strip()
-		print(msg)
-		if msg == "/help" or msg == "/hello":
-			bot.send_message(chat_id, Config.commands[msg])
-		elif msg == "/start":
-			start_msg(chat_id, sender, username, date)
-		elif msg == "/send":
-			send_msg(chat_id)
-		else:
-			bot.send_message(chat_id, Config.commands["default"])
-	except Exception as e:
-		traceback.print_exc()
-		print("Exception: ",str(e))
-		bot.send_message(chat_id, Config.commands["Exception"])
+	if 'message' in json.loads(event['body']):
+		chat_id, sender, text, username, date = message_check_in(json.loads(event['body'])['message'])
+		try:
+			msg = text.lower().strip()
+			print(msg)
+			if msg == "/help" or msg == "/hello":
+				bot.send_message(chat_id, Config.commands[msg])
+			elif msg == "/start":
+				start_msg(chat_id, sender, username, date)
+			elif msg == "/send":
+				send_msg(chat_id)
+			else:
+				bot.send_message(chat_id, Config.commands["default"])
+		except Exception as e:
+			traceback.print_exc()
+			print("Exception: ",str(e))
+			bot.send_message(chat_id, Config.commands["Exception"])
